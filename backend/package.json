@@ -1,0 +1,29 @@
+{
+  "name": "doctor-as",
+  "version": "1.0.0",
+  "description": "I will create Doctor Appointment System",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "doctor",
+    "appointment",
+    "booking",
+    "react"
+  ],
+  "author": "Hassan",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.2",
+    "multer": "^2.0.1",
+    "nodemon": "^3.1.10"
+  }
+}

@@ -1,0 +1,1 @@
+export const DbName = "Doctor-AP"
