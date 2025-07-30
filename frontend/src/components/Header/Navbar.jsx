@@ -23,7 +23,7 @@ const Navbar = () => {
           {/* Desktop Nav Links */}
           <ul className="hidden md:flex space-x-6 text-sm font-medium">
             <li><NavLink to="/" className={linkClasses}>Home</NavLink></li>
-            <li><NavLink to="/doctors" className={linkClasses}>Doctors</NavLink></li>
+            <li><NavLink to="/doctors" className={linkClasses}>Health Blog</NavLink></li>
             <li><NavLink to="/appointments" className={linkClasses}>Appointments</NavLink></li>
             <li><NavLink to="/about" className={linkClasses}>About</NavLink></li>
             <li><NavLink to="/contact" className={linkClasses}>Contact</NavLink></li>
