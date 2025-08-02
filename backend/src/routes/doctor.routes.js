@@ -24,7 +24,7 @@ DoctorRouter.post(
 // ✅ Read/Get logged-in doctor profile
 DoctorRouter.get(
   "/profile",
-  verifyToken,
+ 
   authorizeRoles("doctor"),
   getDoctorProfile
 );
