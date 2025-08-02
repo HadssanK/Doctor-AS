@@ -1,23 +1,6 @@
-// src/context/AppContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance"; // use custom axios
 
-// ========== Axios global setup ==========
-axios.defaults.baseURL = "http://localhost:5000/api/v1";
-
-axios.interceptors.request.use(
-  (config) => {
-    const user = JSON.parse(localStorage.getItem("user")); // token get from localStorage
-    const token = user?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// ========== Context ========== //
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
@@ -26,10 +9,12 @@ export const AppProvider = ({ children }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ========== Load user from localStorage on mount ==========
+  // Load user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
 
   // ========== Auth ==========
@@ -48,19 +33,31 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const login = async (data) => {
-    setLoading(true);
-    try {
-      const res = await axios.post("/auth/login", data);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      setUser(res.data.user);
-      return res.data;
-    } catch (err) {
-      throw err.response?.data || new Error("Login failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const login = async (data) => {
+  setLoading(true);
+  try {
+    const res = await axios.post("/auth/login", data);
+
+    const user = res.data.user;
+    const token = res.data.accessToken;
+
+    // ✅ Combine token with user
+    const fullUser = { ...user, token };
+
+    // ✅ Store in localStorage
+    localStorage.setItem("user", JSON.stringify(fullUser));
+    setUser(fullUser);
+
+    console.log("✅ Token Found:", token);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || new Error("Login failed.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   const logout = async () => {
     await axios.post("/auth/logout");
@@ -71,14 +68,22 @@ export const AppProvider = ({ children }) => {
   };
 
   // ========== Doctor Profile ==========
-  const createDoctorProfile = async (formData) => {
-    if (!user || user.role !== "doctor") throw new Error("Unauthorized");
-    const res = await axios.post("/doctor/create", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    setDoctorProfile(res.data.doctor);
-    return res.data;
-  };
+ const createDoctorProfile = async (formData) => {
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+  if (!user || user.role !== "doctor") throw new Error("Unauthorized");
+
+  const res = await axios.post("/doctor/create", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`, // ✅ token bhejna
+    },
+  });
+
+  setDoctorProfile(res.data.doctor);
+  return res.data;
+};
+
 
   const getDoctorProfile = async () => {
     if (!user || user.role !== "doctor") throw new Error("Unauthorized");
@@ -137,7 +142,6 @@ export const AppProvider = ({ children }) => {
     return res.data;
   };
 
-  // ========== Return Provider ==========
   return (
     <AppContext.Provider
       value={{
@@ -164,5 +168,4 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-// ========== Custom Hook ==========
 export const useAppContext = () => useContext(AppContext);

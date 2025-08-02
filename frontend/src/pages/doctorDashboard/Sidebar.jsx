@@ -1,15 +1,28 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Calendar,
   User,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
+import { useAppContext } from "../../Context/AppContext";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const { logout } = useAppContext(); // 👈 import logout from context
+  const navigate = useNavigate(); // 👈 for redirect
+
+  const handleLogout = async () => {
+    try {
+      await logout(); // 👈 logout function call
+      navigate("/login"); // 👈 redirect to login
+    } catch (err) {
+      console.error("Logout failed:", err.message);
+    }
+  };
 
   const linkClass =
     "flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition duration-200";
@@ -69,16 +82,14 @@ const Sidebar = () => {
             <span>Profile</span>
           </NavLink>
 
-           <NavLink
-            to="logout"
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : ""}`
-            }
-            onClick={() => setOpen(false)}
+          {/* 🔐 LOGOUT BUTTON */}
+          <button
+            onClick={handleLogout}
+            className={`${linkClass} text-left w-full`}
           >
-            <User size={18} />
+            <LogOut size={18} />
             <span>Logout</span>
-          </NavLink>
+          </button>
         </nav>
       </aside>
     </>

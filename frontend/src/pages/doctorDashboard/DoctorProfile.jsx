@@ -105,6 +105,7 @@ const DoctorProfile = () => {
       }
     } catch (err) {
       alert("Something went wrong: " + err.message);
+          console.error("⚠️ Error loading doctor profile in component:", err.message);
     }
   };
 
