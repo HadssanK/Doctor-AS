@@ -1,22 +1,25 @@
-import jwt from 'jsonwebtoken'
+// middleware/verifyToken.js
+import jwt from 'jsonwebtoken';
 
-const verifyToken = async (req , res , next)=>{
-    const authheader = req.headers.authorization;
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-    if (!authheader || !authheader.startsWith('Bearer')) {
-        res.status(401).json({
-            message: "Unothoraized , Token missing"
-        })
-    }
-    const token = authheader.split(" ")[1];
+  // 1. Check agar token hai hi nahi
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized, token missing" });
+  }
 
-    try {
-        const decoded = jwt.verify(token , process.env.ACCESS_TOKEN_SECRET)
-        req.user = decoded
-        next();
-    } catch (error) {
-       return res.status(401).json({ message: "Invalid or expired token" });
-    }
-}
+  // 2. Token extract karo
+  const token = authHeader.split(" ")[1];
+
+  // 3. Try token verify karna
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    req.user = decoded; // user info request mein attach karo
+    next(); // move to next middleware
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
 
 export { verifyToken };
